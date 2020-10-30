@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "commonjs",
+    "sourceMap": true
+  },
+  "files": [
+    "index.ts"
+  ],
+  "lib": [
+    "es2015"
+  ]
+}

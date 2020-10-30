@@ -25,13 +25,14 @@ class Taln {
     /**
      * Creates an instance of Taln.
      * @author Jérémie Lopez
-     * @param {string[]} phrase Phrase découpée par mot
-     * @param {any} dictionnaire Liste de règle pour l'analyseur
+     * @param {string[]} phrase
+     * @param {*} dictionnaire
      * @memberof Taln
      */
     constructor(
         protected phrase: string[],
         protected dictionnaire: any,
+        protected translation?: boolean
     ) { }
 
 
@@ -84,6 +85,10 @@ class Taln {
             // ADVERBE
             if (this.litMot(mot, WordType.ADVERBE)) {
                 console.info(`${mot} est un adverbe.`, `Il est libre de se placer n'importe où.`);
+
+                if (this.dictionnaire[mot].raccourci && this.commenceParUneVoyelle(phrase[i + 1])) {
+                    phrase[i] = this.dictionnaire[mot].raccourci[0];
+                }
 
                 groupes.push(['adverbe']);
                 return;
@@ -179,6 +184,10 @@ class Taln {
                     console.error(error);
                 }
 
+                if (this.dictionnaire[mot].raccourci && this.commenceParUneVoyelle(phrase[i + 1])) {
+                    phrase[i] = this.dictionnaire[mot].raccourci[0];
+                }
+
                 currentGroupe.push(WordType.PRONOM_PERSONNEL);
 
                 return;
@@ -241,6 +250,7 @@ class Taln {
 
         console.log();
         console.log(`Phrase: ${phrase.join(' ')}`);
+        console.log(`Traduction: The lion does not associate with the cockroach`);
         console.info(errors.length === 0 ? `Conclusion: cette phrase est correcte !` : `Conclusion: cette phrase est incorrecte !`);
         return errors.length === 0;
     }
@@ -314,49 +324,108 @@ class Taln {
 
         return enable;
     }
+
+
+    /**
+     * @description Vérifie si le mot commence par une voyelle
+     * @author Jérémie Lopez
+     * @protected
+     * @param {string} mot
+     * @return {*}  {boolean}
+     * @memberof Taln
+     */
+    protected commenceParUneVoyelle(mot: string): boolean {
+        return mot.toLocaleLowerCase().startsWith('a') ||
+            mot.toLocaleLowerCase().startsWith('à') ||
+            mot.toLocaleLowerCase().startsWith('â') ||
+            mot.toLocaleLowerCase().startsWith('ä') ||
+            mot.toLocaleLowerCase().startsWith('e') ||
+            mot.toLocaleLowerCase().startsWith('é') ||
+            mot.toLocaleLowerCase().startsWith('è') ||
+            mot.toLocaleLowerCase().startsWith('ê') ||
+            mot.toLocaleLowerCase().startsWith('ë') ||
+            mot.toLocaleLowerCase().startsWith('i') ||
+            mot.toLocaleLowerCase().startsWith('ï') ||
+            mot.toLocaleLowerCase().startsWith('o') ||
+            mot.toLocaleLowerCase().startsWith('ô') ||
+            mot.toLocaleLowerCase().startsWith('u') ||
+            mot.toLocaleLowerCase().startsWith('ù') ||
+            mot.toLocaleLowerCase().startsWith('û') ||
+            mot.toLocaleLowerCase().startsWith('ü');
+    }
 }
 
 
+
+// Dictionnaire avec les traductions mot à mot
 const dictionnaire = {
     le: {
         article: ['articleDefini'],
         articleDefini: ['le'],
         groupeNominal: ['article', 'nomCommun', 'adjectif'],
-        phrase: ['groupeNominal', 'groupeVerbal', 'groupeNominal']
-
+        phrase: ['groupeNominal', 'groupeVerbal', 'groupeNominal'],
+        translation: {
+            eng: 'the'
+        }
     },
     lion: {
         nomCommun: ['lion'],
         groupeNominal: ['article', 'nomCommun', 'adjectif'],
-        phrase: ['groupeNominal', 'groupeVerbal', 'groupeNominal']
+        phrase: ['groupeNominal', 'groupeVerbal', 'groupeNominal'],
+        translation: {
+            eng: 'lion'
+        }
     },
     ne: {
         adverbe: ['ne'],
         raccourci: ['n\''],
+        translation: {
+            eng: ''
+        }
     },
     se: {
         pronomPersonnel: ['se'],
         raccourci: ['s\''],
+        translation: {
+            eng: 'itself'
+        }
     },
     associe: {
         verbe: ['associe'],
         groupeVerbal: ['pronomPersonnel', 'verbe'],
-        phrase: ['groupeNominal', 'groupeVerbal', 'groupeNominal']
+        phrase: ['groupeNominal', 'groupeVerbal', 'groupeNominal'],
+        translation: {
+            eng: 'associate',
+            groupeVerbal: ['verbe', 'pronomPersonnel'],
+        }
     },
     pas: {
-        adverbe: ['pas']
+        adverbe: ['pas'],
+        translation: {
+            eng: ''
+        }
     },
     avec: {
-        adverbe: ['avec']
+        adverbe: ['avec'],
+        translation: {
+            eng: 'with'
+        }
     },
     cafard: {
         nomCommun: ['cafard'],
         groupeNominal: ['article', 'nomCommun', 'adjectif'],
-        phrase: ['groupeNominal', 'groupeVerbal', 'groupeNominal']
+        phrase: ['groupeNominal', 'groupeVerbal', 'groupeNominal'],
+        translation: {
+            eng: 'cockroach'
+        }
     }
 };
 
 
-const phrase = ['le', 'lion', 'ne', 'se', 'associe', 'avec', 'le', 'cafard'];
-const taln = new Taln(phrase, dictionnaire);
+const phrase = ['le', 'lion', 'ne', 'se', 'associe', 'pas', 'avec', 'le', 'cafard'];
+const taln = new Taln(phrase, dictionnaire, true);
 taln.litPhrase();
+
+
+// Objectif de traduction :
+// The lion does not associate with the cockroach

@@ -3,6 +3,6 @@
 Pour lancer le projet :
 
 ```
-npm i
+npm i -g typescript
 npm start
 ```

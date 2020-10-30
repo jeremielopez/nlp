@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsc index.ts && node index.js"
+    "start": "npm run build && node index.js",
+    "build": "tsc -p tsconfig.json"
   },
   "keywords": [
     "Analyse LL",
